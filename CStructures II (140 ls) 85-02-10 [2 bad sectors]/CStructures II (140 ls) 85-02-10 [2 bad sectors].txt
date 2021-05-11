@@ -1,0 +1,1425 @@
+-------------------------------------------- SCREEN 000
+( CGRAPH II LOAD SCREEN  LRP  1/27/85)  
+                                        
+151 187 THRU                            
+200 203 THRU                            
+190 192 THRU                            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 011
+( CGAPH    LRP   1/26/85 )              
+                                        
+: CGRAPH ;                              
+                                        
+0 CONSTANT FALSE                        
+                                        
+1 CONSTANT TRUE                         
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 012
+( LIST WORDS        LRP   1/26/85 )     
+                                        
+: GET  ( n -- adr of link )             
+       ( Get link with n fields         
+         from HERE.)                    
+    DUP HERE SWAP 0 FILL                
+        HERE SWAP ALLOT ;               
+                                        
+: PUT  ( list.adr  link.adr -- )        
+    SWAP DDUP @ SWAP ! ( link <-        
+                                <list>) 
+              ! ;      ( list <- link ) 
+                                        
+: APPEND   ( le list -- )               
+    OVER 0 SWAP !                       
+    BEGIN DUP @ WHILE                   
+    @ REPEAT ! ;                        
+                                        
+: #LIST   ( adr -- n )                  
+     ( Given head of list, returns      
+       no. elements in list. )          
+   0 BEGIN    OVER @                    
+     WHILE    1+   SWAP @ SWAP          
+     REPEAT   SWAP DROP ;               
+-------------------------------------------- SCREEN 013
+( #LIST    LRP   1/26/85 )              
+                                        
+: POS  ( -- )                           
+    ( Define POS )                      
+    CREATE                              
+    DOES> ;                             
+                                        
+: POS-PTR  ( node.adr -- )   4 + ;      
+                                        
+: !POS   ( pos node.adr -- )            
+    POS-PTR ! ;                         
+                                        
+: @POS  ( node.adr -- ptr to pos )      
+    POS-PTR  @ ;                        
+                                        
+: .POS   ( node.adr -- )                
+   @POS NFA ID. ;                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 014
+( POS  LRP  1/26/85 )                   
+                                        
+: CON-PTR   ( node.adr --  adr of ptr   
+              to concept )              
+    2+ ;                                
+                                        
+: !CONCEPT  ( adr of concept   node.adr 
+              -- )                      
+    CON-PTR ! ;                         
+                                        
+: @CONCEPT  ( node.adr -- ptr to        
+              concept )                 
+    CON-PTR @ ;                         
+                                        
+: .CONCEPT   ( node.adr -- )            
+     @CONCEPT NFA ID. ;                 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 015
+( CONCEPTS      LRP     1/11/85 )       
+                                        
+: CONCEPT  ( -- )                       
+    CREATE                              
+      0 , 0 , 0 ,                       
+    DOES> ;                             
+                                        
+: GRAPHS   ( adr -- adr1 )              
+    0 + ;                               
+                                        
+: SUPERTYPES  ( adr -- adr1 )           
+    2+ ;                                
+                                        
+: SUBTYPES    ( adr -- adr1 )           
+    4 + ;                               
+                                        
+EXIT                                    
+                                        
+CONCEPT is a defining word to create    
+concept headers in the FORTH            
+dictionary -- e.g. CONCEPT UNICORN.     
+UNICORN GRAPHS puts the address of the  
+pointer to the graph list on the stack. 
+                                        
+-------------------------------------------- SCREEN 016
+( CGRAPHS      LRP    1/11/85 )         
+                                        
+: VOCAB   ( -- )                        
+    CREATE                              
+      0 ,    ( Ptr to concepts list. )  
+    DOES> ( Eventually put processing   
+            word here ) ;               
+                                        
+EXIT                                    
+                                        
+VOCAB is a defining word to enter       
+lexicon entries into the FORTH          
+dictionary -- e.g. VOCAB unicorn.       
+When the new word "unicorn" is executed 
+the address of the head of the CONCEPTS 
+list is put on the stack.               
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 017
+( MEANS    LRP    1/13/85 )             
+                                        
+                                        
+: MEANS  ( pos list.adr con.adr -- )    
+     FIND 2+            ( con.adr )     
+     OVER 6 GET  PUT       ( link )     
+     OVER @  !CONCEPT                   
+          @  !POS ;                     
+                                        
+                                        
+                                        
+EXIT                                    
+                                        
+MEANS links concept pointers to         
+lexicon entries.                        
+Example, NOUN cat MEANS ANIMAL. The     
+lexicon entry can be linked to multiple 
+concepts.                               
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 018
+( MEANS?   LRP   1/27/85 )              
+                                        
+: MEANS?   ( adr -- )                   
+    ( Given address of word in lexicon,)
+    ( Traverse concept list. )          
+    CR                                  
+    BEGIN                               
+       DUP @                            
+    WHILE                               
+       @ DUP          .CONCEPT          
+         DUP 5 SPACES .POS              
+         CR                             
+    REPEAT DROP ;                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 019
+( IS-A     LRP    1/13/85 )             
+                                        
+: IS-A         ( sub.adr  -- )          
+   FIND 2+     ( sub.adr sup.adr -- )   
+   DDUP SWAP SUPERTYPES DUP 4 GET PUT   
+                        @  !CONCEPT     
+             SUBTYPES   DUP 4 GET PUT   
+                        @ !CONCEPT  ;   
+                                        
+                                        
+                                        
+                                        
+EXIT                                    
+                                        
+IS-A links together the                 
+SUBTYPE/SUPERTYPE lists. Example,       
+FELINE IS-A ANIMAL.                     
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 020
+(  RELATION    LRP   2/17/85 )          
+                                        
+: RELATION    ( n -- ; means relation   
+                is n-adic )             
+    CONSTANT ;                          
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 021
+( TYPES?  DENOTES?   LRP   1/27/85 )    
+                                        
+VARIABLE ROOT                           
+                                        
+VARIABLE NODE.PTR                       
+                                        
+VARIABLE LIST.PTR                       
+                                        
+: GRAPHLIST   ( -- )                    
+    ' GRAPHS LIST.PTR ! ;               
+                                        
+: SUBLIST  ( -- )                       
+    ' SUBTYPES LIST.PTR ! ;             
+                                        
+: SUPLIST  ( -- )                       
+    ' SUPERTYPES LIST.PTR ! ;           
+                                        
+: @LIST   ( concept.adr -- list.adr )   
+    LIST.PTR @ CFA EXECUTE ;            
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 022
+( TYPES?   DENOTES?   LRP   1/27/85 )   
+                                        
+: LCHILD   ( adr1 -- adr2 )             
+    @ ;                                 
+                                        
+: RCHILD   ( adr1 -- adr2 )             
+    @CONCEPT @LIST @ ;                  
+                                        
+: VISIT   ( adr -- )                    
+    .CONCEPT  CR ;                      
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 023
+( TYPES?  DENOTES?    LRP   1/27/85 )   
+                                        
+: PLUNGE     ( -- n1 n2 ... n )         
+    ( Assumes address of concept is)    
+    ( stored in NODE.PTR. )             
+    BEGIN                               
+      NODE.PTR  @ LCHILD                
+    WHILE                               
+      NODE.PTR @ NODE.PTR @             
+      LCHILD NODE.PTR !                 
+    REPEAT ;                            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 024
+( TYPES?  DENOTES?   LRP    1/27/85 )   
+                                        
+1 CONSTANT EXIT-FLG                     
+                                        
+: STEPRT   ( -- flg )                   
+    BEGIN                               
+      NODE.PTR @ VISIT                  
+      NODE.PTR @ RCHILD NODE.PTR !      
+      NODE.PTR @                        
+          IF                            
+             EXIT-FLG NOT EXIT-FLG      
+          ELSE                          
+             DEPTH IF                   
+                     NODE.PTR !         
+                     EXIT-FLG NOT       
+                   ELSE                 
+                     EXIT-FLG EXIT-FLG  
+                   THEN                 
+          THEN                          
+    UNTIL  ;                            
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 025
+( TYPES?  DENOTES?     LRP   1/27/85 )  
+                                        
+: TRAV    (  -- )                       
+     ( Assume head of list is stored    
+       in ROOT )                        
+     ROOT @                             
+         IF                             
+           ROOT @  NODE.PTR !           
+           BEGIN                        
+             PLUNGE                     
+             STEPRT                     
+           UNTIL                        
+         THEN ;                         
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 026
+( TYPES?  DENOTES?    LRP    1/27/85 )  
+                                        
+: TYPES?  ( adr -- )                    
+    SUPLIST                             
+    CR SUPERTYPES @ ROOT !              
+    TRAV ;                              
+                                        
+                                        
+: DENOTES?  ( adr -- )                  
+    SUBLIST                             
+    CR SUBTYPES @ ROOT !                
+    TRAV ;                              
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 027
+EXIT                                    
+                                        
+Now I will start on the interpreter for 
+the linear representation of conceptual 
+graphs. See Sowa p. 78 & p. 395.        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 028
+( REF FIELDS      LRP    2/3/85 )       
+                                        
+1000 CONSTANT QUOTA                     
+( Allocation for NODES and REFS )       
+                                        
+VARIABLE NODESPACE QUOTA ALLOT          
+( Space for nodes )                     
+                                        
+VARIABLE NODES                          
+( Ptr to free space in NODESPACE )      
+                                        
+: RESET-NODES  ( -- )                   
+    NODESPACE NODES ! ;                 
+                                        
+RESET-NODES                             
+                                        
+NODESPACE QUOTA + CONSTANT -NODES       
+( Upper limit of NODESPACE )            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 029
+( REF FIELDS      LRP    2/3/85 )       
+                                        
+VARIABLE REFSPACE QUOTA ALLOT           
+( Space for referent strings )          
+                                        
+VARIABLE REFS                           
+( Ptr to free space in REFSPACE )       
+                                        
+: RESET-REFS   ( -- )                   
+    REFSPACE REFS  ! ;                  
+                                        
+RESET-REFS                              
+                                        
+REFSPACE QUOTA + CONSTANT -REFS         
+( Upper limit of REFSPACE )             
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 030
+( Range tests     LRP     2/3/85 )      
+                                        
+: NODES?  ( n -- ; where n is value )   
+          ( to be added to NODES. )     
+    NODES @ +                           
+    -NODES SWAP - 0<                    
+    ABORT" No room in NODESPACE " ;     
+                                        
+: REFS?  ( n -- ; where n is value )    
+         ( to be added to REFS. )       
+    REFS @ +                            
+    -REFS SWAP - 0<                     
+    ABORT" No room in REFSPACE " ;      
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 031
+( GETNODE      LRP   2/3/85 )           
+                                        
+VARIABLE <CON>                          
+( Ptr to current concept node )         
+                                        
+VARIABLE <REL>                          
+( Ptr to current relation node )        
+                                        
+VARIABLE <GRAPH> 2 ALLOT                
+( Ptr to current graph; 0+ is           
+  head of relation list, 2+ is head     
+  of concept list )                     
+                                        
+0 0 <GRAPH> D!                          
+                                        
+VARIABLE <GRAPHS>                       
+( Ptr to list of graphs )               
+                                        
+VARIABLE $BUFFER 40 ALLOT               
+( String buffer )                       
+                                        
+VARIABLE TEMP                           
+( Temporary storage for concept         
+  pointer )                             
+-------------------------------------------- SCREEN 032
+( REFS     LRP     2/3/85 )             
+                                        
+: REF-PTR  ( adr -- ref.adr )           
+     4 + ;                              
+                                        
+: OUT-PTR  ( adr -- in.adr )            
+     6 + ;                              
+                                        
+: !REF.ADR  ( adr -- )                  
+     REF-PTR  REFS @ SWAP ! ;           
+                                        
+: .REF   ( adr -- )                     
+     ( Given adr of concept node,       
+       prints referent string. )        
+     REF-PTR @ COUNT TYPE ;             
+                                        
+: .CNODE   ( adr -- )                   
+    ( Given adr of node, print          
+      concept and referent. )           
+    DUP .CONCEPT .REF ;                 
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 033
+( MORE VARIABLES   LRP  2/14/85 )       
+                                        
+VARIABLE DIRFLAG                        
+( 0 is <- ; 1 is -> )                   
+                                        
+VARIABLE ARCFLAG                        
+( 1 means arc has has been entered.)    
+0 ARCFLAG !                             
+                                        
+VARIABLE CSTACK 10 ALLOT                
+( Stack for concept pointers )          
+                                        
+VARIABLE CSTACK.PTR                     
+( Ptr to top of CSTACK )                
+                                        
+CSTACK CSTACK.PTR !                     
+                                        
+VARIABLE RSTACK 10 ALLOT                
+( Stack for concept pointers )          
+                                        
+VARIABLE RSTACK.PTR                     
+( Ptr to top of RSTACK )                
+                                        
+RSTACK RSTACK.PTR !                     
+-------------------------------------------- SCREEN 034
+( CSTACK    LRP   2/14/85 )             
+                                        
+: CPUSH  ( adr -- ; push adr on CSTACK) 
+    CSTACK.PTR @ !                      
+    2 CSTACK.PTR +! ;                   
+                                        
+: CDEPTH  ( -- n; depth of CSTACK)      
+    CSTACK.PTR @ CSTACK -  2 / ;        
+                                        
+: CPOP  ( -- adr; pop adr from CSTACK)  
+    CDEPTH 0=                           
+    ABORT" CSTACK UNDERFLOW "           
+    -2 CSTACK.PTR +!                    
+    CSTACK.PTR @ @  ;                   
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 035
+( RSTACK    LRP   2/14/85 )             
+                                        
+: RPUSH  ( adr -- ; push adr on RSTACK) 
+    RSTACK.PTR @ !                      
+    2 RSTACK.PTR +! ;                   
+                                        
+: RDEPTH  ( -- n; depth of RSTACK)      
+    RSTACK.PTR @ RSTACK -  2 / ;        
+                                        
+: RPOP  ( -- adr; pop adr from RSTACK)  
+    RDEPTH 0=                           
+    ABORT" RSTACK UNDERFLOW "           
+    -2 RSTACK.PTR +!                    
+    RSTACK.PTR @ @ ;                    
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 036
+( GETNODE      LRP   2/3/85 )           
+                                        
+: GETNODE  ( n -- adr of link )         
+     ( Get link with n fields from      
+       NODES. )                         
+     DUP NODES?                         
+     DUP NODES @ SWAP  0 FILL           
+         NODES @ SWAP                   
+         NODES +! ;                     
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 037
+( LINK-ARC   LRP   2/14/85 )            
+                                        
+: LINK-ARC   ( node.adr arc.ptr -- )    
+    ( Link arc.ptr to node )            
+    4 GETNODE                           
+    DUP 2+ ROT SWAP !                   
+    PUT ;                               
+                                        
+: REL.NODE   ( rel.pfa -- node.adr )    
+             ( create relation node )   
+    DUP CFA EXECUTE                     
+    2* 4 + GETNODE                      
+    SWAP OVER 2+ ! ;                    
+                                        
+: REL-PTR  ( node.adr -- adr of ptr     
+             to relaton )               
+    2+ ;                                
+                                        
+: !RELATION  ( rel.adr node.adr -- )    
+    REL-PTR !  ;                        
+                                        
+: @RELATION  ( node.adr -- rel.adr )    
+    REL-PTR @ ;                         
+                                        
+-------------------------------------------- SCREEN 038
+( CON-IN  CON-OUT   LRP   2/14/85 )     
+                                        
+: .RELATION   ( node.adr -- )           
+   @RELATION NFA ID. ;                  
+                                        
+: <REL-IN>  ( node.adr -- conin.adr )   
+   ( Get first relation node concept    
+     inptr )                            
+   4 + ;                                
+                                        
+: <REL-OUT>  ( node.adr -- conout.adr ) 
+   ( Get relation node concept outptr)  
+   DUP 2+ @ CFA EXECUTE                 
+   1- 2 * 4 + + ;                       
+                                        
+: REL-OUT  ( con.adr node.adr -- )      
+           ( Store concept in right     
+             location within rel.node)  
+   <REL-OUT> ! ;                        
+                                        
+: REL-IN  ( con.adr node.adr -- )       
+     ( NOTE this won't work             
+     for tri-adic relations!!!!! )      
+   <REL-IN> ! ;                         
+-------------------------------------------- SCREEN 039
+( !$BUFF.ADR   LRP    2/9/85 )          
+                                        
+: CON-IN   ( -- ; assumes relation      
+             pointing to concept;       
+             con.adr in <CON> and       
+             rel.adr in <REL> )         
+    <CON> @ <REL> @ REL-OUT ;           
+                                        
+: CON-OUT  ( -- ; assumes concept       
+             pointing to relation;      
+             con.adr in <CON> and       
+             rel.adr in <REL> )         
+          ( NOTE -- This won't work     
+            for tri-adic relations!!! ) 
+    <CON> @ OUT-PTR <REL> @ LINK-ARC    
+    <CON> @ <REL> @ REL-IN ;            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 040
+( !GRAPH   LRP    2/9/85 )              
+                                        
+: !$BUFF.ADR   ( adr -- )               
+    REF-PTR  $BUFFER SWAP ! ;           
+                                        
+: LINK-CNODE   ( node.adr -- )          
+    <GRAPH> CON-PTR APPEND ;            
+                                        
+: LINK-RNODE  ( node.adr -- )           
+    <GRAPH> APPEND ;                    
+                                        
+: !GRAPH   ( -- )                       
+    ( Link graph pointed to by <GRAPH>  
+      to lists pointed to by <GRAPHS> ) 
+    6 GETNODE                           
+    <GRAPHS> OVER PUT                   
+    CON-PTR                             
+    <GRAPH> D@ ROT D! ;                 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 041
+( COMPARE STRINGS   LRP  10/7/84 )      
+                                        
+: -TEXT   ( adr1 n1 adr2 -- n2 )        
+                                        
+      ( Compare strings character by )  
+      ( character. String 1 at adr1; )  
+      ( n1 is length; string 2 at adr2) 
+      ( If n2 = 1, $1>$2; if 0, $1=$2;) 
+      ( if -1, $1<$2 )                  
+                                        
+     DDUP + ( 2+ ) SWAP                 
+     DO DROP 1+ DUP 1-                  
+        C@ I C@ - DUP                   
+        IF DUP ABS / LEAVE THEN         
+     LOOP SWAP DROP ;                   
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 042
+( COMPARE STRINGS    LRP  10/7/84 )     
+                                        
+: STRINGS=?  ( adr1 adr2 -- flag )      
+      ( String1 at adr1; string2 at )   
+      ( adr2.  Flag = 0, strings are )  
+      ( = ; flag -1, $1 < $2; flag 1 )  
+      ( $1 > $2 )                       
+   DDUP SWAP COUNT ROT 1+  ( Set up )   
+              ( stack for -TEXT )       
+   -TEXT                                
+   DUP IF                               
+         SWAP DROP SWAP DROP ( < or >)  
+       ELSE                             
+         DROP SWAP C@ SWAP C@ -         
+                 ( -TEXT =, compare )   
+                 ( counts )             
+       THEN ;                           
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 043
+( NEWNODE    LRP   2/10/85 )            
+                                        
+: NEWNODE    ( -- )                     
+        ( Given pointer to CONCEPT in   
+          TEMP and referent string in   
+          $BUFFER, create a new node )  
+          ( linked to <CON>. )          
+     $BUFFER C@ 1+ REFS?                
+          ( Room in REFSPACE? )         
+     <CON> 10 GETNODE PUT               
+          ( Link node to <CON>. )       
+     TEMP @  <CON> @ CON-PTR !          
+          ( Store pointer to CONCEPT in 
+            node. )                     
+     REFS @ <CON> @ REF-PTR !           
+          ( Store pointer to referent   
+            in node. )                  
+     $BUFFER REFS @                     
+     $BUFFER C@ 1+ CMOVE                
+     $BUFFER C@ 1+ REFS +!              
+          ( Move referent to REFSPACE. )
+     <CON> @ LINK-CNODE ;               
+          ( Append to graph. )          
+                                        
+-------------------------------------------- SCREEN 044
+( COMPARE-NODES    LRP   2/10/85 )      
+                                        
+: NODE-EXISTS   ( node.adr -- )         
+    <CON> !  ;                          
+                                        
+: CON=?  ( node.adr -- f; where 1 is =) 
+     CON-PTR @ TEMP @ = ;               
+                                        
+: REF=?   ( adr -- f; where 1 is = )    
+    REF-PTR @ $BUFFER STRINGS=? NOT ;   
+                                        
+: COMPARE-NODES   ( node.adr -- )       
+     BEGIN                              
+        @  DUP                          
+     WHILE                              
+        DUP CON=?                       
+        IF DUP REF=?                    
+           IF  NODE-EXISTS EXIT         
+           THEN                         
+        THEN                            
+     REPEAT                             
+     DROP NEWNODE ;                     
+                                        
+                                        
+-------------------------------------------- SCREEN 045
+( .LIST    LRP   2/13/85 )              
+                                        
+: .CLIST  ( adr -- )                    
+         ( Given head of list, prints   
+           list of concept nodes. )     
+     <GRAPH> CON-PTR                    
+     1 BEGIN                            
+       WHILE                            
+         @ DUP IF                       
+                 DUP CR .CNODE          
+               THEN                     
+         DUP                            
+       REPEAT DROP ;                    
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 046
+( .RLIST    LRP   2/13/85 )             
+                                        
+: .RLIST  ( adr -- )                    
+         ( Given head of list, prints   
+           list of concept nodes. )     
+     <GRAPH>                            
+     1 BEGIN                            
+       WHILE                            
+         @ DUP IF                       
+                 DUP CR .RELATION       
+               THEN                     
+         DUP                            
+       REPEAT DROP ;                    
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 047
+( LINK-ARC   LRP   2/15/85 )            
+                                        
+: LINK-ARCS  ( -- )                     
+    ARCFLAG @ IF                        
+                DIRFLAG @ IF            
+                            CON-IN      
+                          ELSE          
+                            CON-OUT     
+                          THEN          
+              THEN    0 ARCFLAG ! ;     
+                                        
+EXIT                                    
+                                        
+If ARCFLAG is set, LINK-ARCS links      
+concept at <CON> to relation at         
+<REL>. DIRFLAG specifies whether        
+arc is pointing toward concept or       
+away from concept.                      
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 050
+( ->   <-     LRP     2/3/85 )          
+                                        
+VOCABULARY CONGRAPHS                    
+                                        
+CONGRAPHS DEFINITIONS                   
+                                        
+: ->                                    
+    1 DIRFLAG !                         
+    1 ARCFLAG ! ;                       
+                                        
+: <-                                    
+    0 DIRFLAG !                         
+    1 ARCFLAG ! ;                       
+                                        
+FORTH DEFINITIONS                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 051
+( [  [  (     LRP     2/3/85 )          
+                                        
+CONGRAPHS DEFINITIONS                   
+                                        
+: [    ( -- )                           
+       FIND 2+                          
+       TEMP ! ;                         
+                                        
+: ]   ( -- )                            
+      45 45 42 3                        
+      4 0 DO                            
+             I $BUFFER + C!             
+          LOOP                          
+      <GRAPH> CON-PTR COMPARE-NODES     
+      LINK-ARCS ;                       
+                                        
+: (                                     
+     FIND 2+ REL.NODE                   
+     <REL> SWAP PUT ;                   
+                                        
+FORTH DEFINITIONS                       
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 052
+\ :  )   LRP   2/13/85                  
+                                        
+CONGRAPHS DEFINITIONS                   
+                                        
+: )                                     
+    DIRFLAG @ NOT DIRFLAG !             
+    LINK-ARCS                           
+    DIRFLAG @ NOT DIRFLAG !             
+    <REL> @ <GRAPH> SWAP PUT ;          
+                                        
+: :                                     
+    93 WORD                             
+    DUP C@ 1+                           
+        $BUFFER                         
+        SWAP CMOVE                      
+        <GRAPH> CON-PTR COMPARE-NODES   
+        LINK-ARCS ;                     
+                                        
+                                        
+FORTH DEFINITIONS                       
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 060
+( DATA       LRP  1/26/85 )             
+                                        
+POS NOUN                                
+POS VERB                                
+POS ADJECTIVE                           
+POS ADVERB                              
+POS DET                                 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 061
+( EXAMPLE ENTRIES    LRP   1/16/85 )    
+                                        
+                                        
+CONCEPT FELINE                          
+CONCEPT MAMMAL                          
+CONCEPT ANIMATE                         
+CONCEPT EARTHMOVER                      
+CONCEPT INANIMATE                       
+CONCEPT CANINE                          
+                                        
+2 RELATION AGNT                         
+2 RELATION OBJ                          
+2 RELATION INST                         
+2 RELATION MATR                         
+2 RELATION PART                         
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 062
+( EXAMPLE ENTRIES    LRP   1/16/85 )    
+                                        
+FELINE IS-A MAMMAL                      
+MAMMAL IS-A ANIMATE                     
+EARTHMOVER IS-A INANIMATE               
+CANINE IS-A MAMMAL                      
+                                        
+VOCAB cat                               
+VOCAB tabby                             
+VOCAB dog                               
+                                        
+NOUN cat MEANS FELINE                   
+NOUN cat MEANS EARTHMOVER               
+NOUN dog MEANS CANINE                   
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 063
+                                        
+                                        
+                                        
+                                        
+                                        
+CONCEPT HOUSEPET                        
+FELINE IS-A HOUSEPET                    
+                                        
+CONCEPT ENTITY                          
+ANIMATE IS-A ENTITY                     
+                                        
+CONCEPT POSSESSION                      
+HOUSEPET IS-A POSSESSION                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 110
+( PLAY    LRP   2/27/85 )               
+                                        
+VARIABLE COND1                          
+VARIABLE COND2                          
+VARIABLE ACTION1                        
+VARIABLE ACTION2                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 111
+( PARNAS' IT...TI STRUCTURE )           
+                                        
+                                        
+: ROTB   ( N1 N2 N3 -- N3 N1 N2 )       
+   ROT ROT ;                            
+                                        
+: BACK!  ( TO-ADR BRANCH ADDRESS -- )   
+   SWAP OVER - SWAP ! ;                 
+                                        
+: BACKFILL  ( TO-ADR LIST-ADR -- )      
+   BEGIN DUP WHILE DUP @ >R OVER SWAP   
+   BACK! R> REPEAT DROP DROP ;          
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 112
+( IT...TI WORDS )                       
+                                        
+: IT  ( -- IT-LOC ENDIT-LIST IT-ID# )   
+   HERE 0 16 ; IMMEDIATE                
+                                        
+: ENDIT  ( IT-LOC ENDIT-LIST IT-ID# )   
+     ( OR  IT-LOC ENDIT-LIST CAND-LIST  
+     (     IFF-ID# -- )                 
+   ?COMP DUP 18 = IF DROP HERE SWAP     
+   BACKFILL 16 THEN 16 ?PAIRS HERE      
+   SWAP BACKFILL DROP ; IMMEDIATE       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 113
+( IT...TI )                             
+                                        
+: CAND  ( IT-LOC ENDIT-LIST IT-ID#      
+    ( OR  IT LOC ENDIT-LIST CAND-LIST   
+    (     COR-LIST CAND-ID# -- IT-LOC ) 
+    (     ENDIT-LIST CAND-LIST  )       
+    (     COR-LIST CAND-ID# )           
+   ?COMP COMPILE 0BRANCH DUP            
+   17 = IF    HERE ROT , SWAP           
+        ELSE  16 ?PAIRS 0 HERE 0 , 17   
+        THEN ; IMMEDIATE                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 114
+( IT...TI WORDS )                       
+                                        
+: COR  ( IT-LOC ENDIT-LIST IT-ID# )     
+    ( OR IT-LOC ENDIT-LIST CAND-LIST )  
+    (    COR-LIST CAND-ID# -- IT-LOC )  
+    (    ENDIT-LIST CAND-LIST )         
+    (    COR-LIST CAND-ID# )            
+   ?COMP COMPILE 0= COMPILE 0BRANCH     
+   DUP 17 = IF ROT HERE SWAP , ROTB     
+   ELSE 16 ?PAIRS HERE 0 , 0 17 THEN ;  
+   IMMEDIATE                            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 115
+( IT...TI WORDS )                       
+                                        
+: IFF  ( IT-LOC ENDIT-LIST IT-ID# )     
+   ( OR  IT-LOC ENDIT-LIST CAND-LIST )  
+   (     COR-LIST CAND-ID# -- IT-LOC )  
+   (     ENDIT-LIST CAND-LIST IFF-ID# ) 
+   [COMPILE] CAND DROP HERE ROT         
+   BACKFILL 18 ; IMMEDIATE              
+                                        
+: BREAK ( IT-LOC ENDIT-LIST IT-ID# )    
+     ( OR IT-LOC ENDIT-LIST CAND-LIST ) 
+     ( IFF-ID# -- IT-LOC ENDIT-LIST )   
+     ( IT-ID# )                         
+   ?COMP DUP 16 = IF 2+ 0 SWAP THEN     
+   18 ?PAIRS >R COMPILE BRANCH HERE     
+   SWAP , HERE R> BACKFILL 16 ;         
+   IMMEDIATE                            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 116
+( IT...TI WORDS )                       
+                                        
+: CONTINUE ( IT-LOC ENDIT-LIST IT-ID# ) 
+        ( OR IT-LOC ENDIT-LIST )        
+        (    CAND-LIST IFF-ID# )        
+        (    -- IT-LOC ENDIT-LIST )     
+        (    IT-ID# )                   
+   ?COMP DUP 16 = IF 2+ 0 SWAP THEN     
+   18 ?PAIRS >R COMPILE BRANCH OVER     
+   HERE 0 , BACK! HERE R> BACKFILL      
+   16 ; IMMEDIATE                       
+                                        
+                                        
+: SUBCASES ( IT-LOC ENDIT-LIST )        
+           ( CAND-LIST IFF-ID# )        
+           ( -- CAND-LIST SUB-ID# )     
+           ( IT-LOC ENDIT-LIST IT-ID# ) 
+     ?COMP 18 ?PAIRS ROTB 19 ROTB 16 ;  
+     IMMEDIATE                          
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 117
+( IT...TI WORDS )                       
+                                        
+: ENDSUB  ( CAND-LIST SUB-ID# IT-LOC )  
+          ( ENDIT-LIST IT-ID# -- )      
+          ( IT-LOC ENDIT-LIST IT-ID# )  
+    ?COMP 16 ?PAIRS ROT 19 ?PAIRS       
+    ROT HERE SWAP BACKFILL 16 ;         
+    IMMEDIATE                           
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 118
+( PLAY    LRP   2/27/85 )               
+                                        
+VARIABLE <COND1>                        
+VARIABLE <COND2>                        
+VARIABLE <ACTION1>                      
+VARIABLE <ACTION2>                      
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 119
+( PLAY   2/27/85 )                      
+                                        
+: C1   KEY 65 = ;                       
+: C2   KEY 66 = ;                       
+: A1  ." ACTION 1 " ;                   
+: A2  ." ACTION 2 " ;                   
+                                        
+' A1 <ACTION1> !                        
+                                        
+' A2 <ACTION2> !                        
+                                        
+' C1 <COND1> !                          
+                                        
+' C2 <COND2> !                          
+                                        
+: COND1  <COND1> @ CFA EXECUTE ;        
+: COND2  <COND2> @ CFA EXECUTE ;        
+: ACTION1 <ACTION1> @ CFA EXECUTE ;     
+: ACTION2 <ACTION2> @ CFA EXECUTE ;     
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 120
+( PLAY   2/27/85 )                      
+                                        
+                                        
+: TEST                                  
+     IT                                 
+       COND1    IFF  ACTION1  CONTINUE  
+       COND2    IFF  ACTION2  CONTINUE  
+     ENDIT ;                            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 121
+( PLAY   LRP  2/27/85 )                 
+                                        
+                                        
+: IFELSE                                
+    IT                                  
+      COND1  IFF ACTION1  BREAK         
+                 ACTION2  BREAK         
+                                        
+    ENDIT ;                             
+                                        
+                                        
+: DOUNTIL                               
+    IT                                  
+      ACTION1                           
+      COND1  IFF  ACTION2  BREAK        
+                           CONTINUE     
+    ENDIT ;                             
+                                        
+: DOWHILE                               
+   IT                                   
+     COND1 IFF ACTION2 BREAK            
+               ACTION1 CONTINUE         
+   ENDIT ;                              
+                                        
