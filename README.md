@@ -1,4 +1,4 @@
-# ApleII-NaturalLanguageProcessing
+# AppleII-NaturalLanguageProcessing
 Various experiments in parsing and natural language processing in the Forth language for the Apple II
 
 Apple II source code, in the Forth language, related to natural lanuage processing and language parsers, from 1985.
